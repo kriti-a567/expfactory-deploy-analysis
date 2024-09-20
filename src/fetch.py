@@ -47,10 +47,13 @@ def preprocess_data(data: dict, outdir: str, file_format: str, target_exp_id: st
      
       
         try:
-            # Check if 'trialdata' is a string and parse it
+            # Check if 'trialdata' is a string or list and parse it
             trial_data_raw = data_dict.get("trialdata", "{}")
-            if isinstance(trial_data_raw, str):
-                trialdata = json.loads(trial_data_raw)
+            if isinstance(trial_data_raw, str) or isinstance(trial_data_raw, list):
+                if isinstance(trial_data_raw, str):
+                    trialdata = json.loads(trial_data_raw)
+                if isinstance(trial_data_raw, list):
+                    trialdata = trial_data_raw
                 df = pd.DataFrame(trialdata)
                 if not df.empty:
                     if "exp_id" in df.columns and not df['exp_id'].isna().all():
@@ -116,7 +119,7 @@ def main():
     load_dotenv()
 
     for data in fetch_data(args.sc_id, args.battery_id, args.prolific_id):
-        preprocess_data(data, outdir, args.file_format, args.exp_id)
+        preprocess_data(data, outdir, 'csv', args.exp_id)
 
 
 if __name__ == "__main__":
